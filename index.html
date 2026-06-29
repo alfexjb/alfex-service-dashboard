@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Alfex Service Department Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0c0f14;
+    --panel: #161b24;
+    --panel-2: #1d2430;
+    --border: #2a3340;
+    --text: #f2f5f9;
+    --muted: #8a97a8;
+    --accent: #4da3ff;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --haas: #4da3ff;
+    --laser: #34d399;
+    --additive: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .title-block { display: flex; align-items: baseline; gap: 16px; }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+  .subtitle { color: var(--muted); font-size: 14px; font-weight: 300; }
+  .header-right { display: flex; align-items: center; gap: 18px; }
+  .clock { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .status-dot {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.stale { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  /* ---------- Division filter ---------- */
+  .filters { display: flex; gap: 8px; }
+  .filter-btn {
+    background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+    padding: 8px 18px; border-radius: 8px; font-family: 'Roboto', sans-serif;
+    font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: #04101f; border-color: var(--accent); font-weight: 700; }
+  /* ---------- Layout grid ---------- */
+  .grid {
+    flex: 1; display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 14px; min-height: 0;
+  }
+  .section-head {
+    grid-column: span 1; display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); padding-bottom: 2px;
+  }
+  .section-head .bar { width: 4px; height: 18px; border-radius: 2px; }
+  .col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  /* ---------- KPI tiles ---------- */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .kpi .label { font-size: 11.5px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+  .kpi .value { font-size: 38px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .kpi .unit { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .kpi.accent .value { color: var(--accent); }
+  .kpi.green .value { color: var(--green); }
+  .kpi.amber .value { color: var(--amber); }
+  .kpi.red .value { color: var(--red); }
+  /* ---------- Chart panels ---------- */
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; min-height: 0; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; display: flex; flex-direction: column; min-height: 0;
+  }
+  .panel h3 { font-size: 12.5px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .panel .chart-wrap { position: relative; flex: 1; min-height: 0; }
+  .panel.wide { grid-column: span 2; }
+  /* ---------- Leaderboard ---------- */
+  .leaderboard-section { grid-column: span 2; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table th {
+    text-align: left; font-size: 11px; color: var(--muted); font-weight: 500;
+    text-transform: uppercase; letter-spacing: .5px; padding: 6px 12px; border-bottom: 1px solid var(--border);
+  }
+  .lb-table th.num, .lb-table td.num { text-align: right; }
+  .lb-table td { padding: 9px 12px; font-size: 15px; border-bottom: 1px solid rgba(42,51,64,.5); font-variant-numeric: tabular-nums; }
+  .lb-table tr:last-child td { border-bottom: none; }
+  .rank { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; background: var(--panel-2); font-size: 12px; font-weight: 700; margin-right: 10px; color: var(--muted); }
+  .rank.gold { background: #3a3416; color: var(--amber); }
+  .rank.silver { background: #2a2f38; color: #cbd5e1; }
+  .rank.bronze { background: #3a2a1a; color: #d9a066; }
+  .tech-name { font-weight: 500; }
+  .bar-cell { width: 160px; }
+  .bar-track { background: var(--panel-2); border-radius: 4px; height: 10px; width: 100%; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 4px; }
+  .kpi-target { color: var(--muted); }
+  /* ---------- Loading / error ---------- */
+  #overlay {
+    position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; z-index: 100; transition: opacity .4s; font-size: 16px; color: var(--muted);
+  }
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .err { color: var(--red); max-width: 480px; text-align: center; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div id="overlay"><div class="spinner"></div><div>Loading service data…</div></div>
+
+  <header>
+    <div class="title-block">
+      <h1>Service Department</h1>
+      <span class="subtitle">Live operations dashboard</span>
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-div="All">All Divisions</button>
+      <button class="filter-btn" data-div="Haas">Haas</button>
+      <button class="filter-btn" data-div="Alfex">Laser</button>
+      <button class="filter-btn" data-div="Additive">Additive</button>
+    </div>
+    <div class="header-right">
+      <div class="clock" id="clock">--:--</div>
+      <div class="status-dot"><span class="dot" id="statusDot"></span><span id="statusText">Updated --</span></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Section headers -->
+    <div class="section-head"><span class="bar" style="background:var(--accent)"></span>Service Tickets</div>
+    <div class="section-head"><span class="bar" style="background:var(--green)"></span>Work Orders</div>
+
+    <!-- LEFT COLUMN: TICKETS -->
+    <div class="col">
+      <div class="kpi-row">
+        <div class="kpi accent"><span class="label">Open Tickets</span><span class="value" id="t_open">–</span></div>
+        <div class="kpi"><span class="label">Opened Today</span><span class="value" id="t_today">–</span></div>
+        <div class="kpi red"><span class="label">High Priority</span><span class="value" id="t_high">–</span></div>
+        <div class="kpi amber"><span class="label">Avg Age <span class="unit">days</span></span><span class="value" id="t_age">–</span></div>
+      </div>
+      <div class="panels">
+        <div class="panel"><h3>Open by Status</h3><div class="chart-wrap"><canvas id="ticketStatusChart"></canvas></div></div>
+        <div class="panel"><h3>Open by Machine Status</h3><div class="chart-wrap"><canvas id="machineStatusChart"></canvas></div></div>
+        <div class="panel wide"><h3>Tickets Created — Last 30 Days</h3><div class="chart-wrap"><canvas id="ticketTrendChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: WORK ORDERS -->
+    <div class="col">
+      <div class="kpi-row">
+        <div class="kpi green"><span class="label">Open WOs</span><span class="value" id="w_open">–</span></div>
+        <div class="kpi"><span class="label">Completed MTD</span><span class="value" id="w_completed">–</span></div>
+        <div class="kpi accent"><span class="label">Scheduled Today</span><span class="value" id="w_scheduled">–</span></div>
+        <div class="kpi amber"><span class="label">Avg Hrs / WO</span><span class="value" id="w_hrs">–</span></div>
+      </div>
+      <div class="panels">
+        <div class="panel"><h3>Open WOs by Stage</h3><div class="chart-wrap"><canvas id="woStatusChart"></canvas></div></div>
+        <div class="panel"><h3>WOs by Type</h3><div class="chart-wrap"><canvas id="woTypeChart"></canvas></div></div>
+        <div class="panel wide"><h3>Work Orders Completed — Last 30 Days</h3><div class="chart-wrap"><canvas id="woTrendChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="leaderboard-section">
+      <div class="section-head"><span class="bar" style="background:var(--purple)"></span>Technician Performance — This Month</div>
+      <div class="panel" style="padding:4px 6px;">
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>Technician</th>
+              <th class="num">Tickets</th>
+              <th class="num">WOs Completed</th>
+              <th class="num">Labour Hrs</th>
+              <th class="num">Avg Hrs / WO</th>
+              <th>Output (relative)</th>
+              <th class="num">KPI Target</th>
+            </tr>
+          </thead>
+          <tbody id="lbBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const API_URL = "https://alfex.app.n8n.cloud/webhook/alfex-service-dashboard";
+const REFRESH_MS = 5 * 60 * 1000; // 5 minutes
+const DIVISION_LABELS = { "All": "All Divisions", "Haas": "Haas", "Alfex": "Laser", "Additive": "Additive" };
+
+let rawData = null;
+let currentDivision = "All";
+let charts = {};
+
+const COLORS = {
+  status: ['#4da3ff', '#fbbf24', '#a78bfa', '#34d399', '#f87171', '#8a97a8'],
+  machine: { 'Machine Down': '#f87171', 'Machine Limited': '#fbbf24', 'Machine Running': '#34d399', 'Not Applicable': '#8a97a8' },
+  stage: { 'Active': '#4da3ff', 'Waiting': '#fbbf24', 'Scheduled': '#a78bfa', 'Completed': '#34d399', 'Cancelled': '#8a97a8', 'Other': '#64748b' },
+  type: ['#4da3ff', '#34d399', '#fbbf24', '#a78bfa', '#f87171', '#22d3ee', '#fb923c', '#94a3b8']
+};
+
+Chart.defaults.color = '#8a97a8';
+Chart.defaults.font.family = 'Roboto';
+Chart.defaults.font.size = 13;
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+setInterval(updateClock, 1000); updateClock();
+
+async function fetchData() {
+  try {
+    const res = await fetch(API_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    rawData = await res.json();
+    render();
+    document.getElementById('overlay').classList.add('hidden');
+    const dot = document.getElementById('statusDot');
+    dot.classList.remove('stale');
+    const t = new Date(rawData.generated_at);
+    document.getElementById('statusText').textContent = 'Updated ' + t.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
+  } catch (e) {
+    console.error(e);
+    document.getElementById('statusDot').classList.add('stale');
+    document.getElementById('statusText').textContent = 'Connection error — retrying';
+    if (!rawData) {
+      document.getElementById('overlay').innerHTML = '<div class="err">Could not load data from Salesforce.<br>The dashboard will keep retrying automatically.<br><br>' + e.message + '</div>';
+    }
+  }
+}
+
+// NOTE: The current API returns org-wide aggregates. Division filtering on tickets
+// (by machine type) and work orders (by record type) is applied client-side where
+// the API exposes per-division breakdowns; KPI tiles show org-wide figures until
+// the API is extended to accept a division parameter (planned enhancement).
+function render() {
+  if (!rawData) return;
+  const t = rawData.tickets, w = rawData.work_orders;
+
+  // ---- Ticket KPIs ----
+  setVal('t_open', t.kpi.open);
+  setVal('t_today', t.kpi.opened_today);
+  setVal('t_high', t.kpi.high_priority_open);
+  setVal('t_age', t.kpi.avg_age_days);
+
+  // ---- WO KPIs ----
+  setVal('w_open', w.kpi.open);
+  setVal('w_completed', w.kpi.completed_mtd);
+  setVal('w_scheduled', w.kpi.scheduled_today);
+  setVal('w_hrs', w.kpi.avg_hrs_per_wo);
+
+  // ---- Charts ----
+  drawDoughnut('ticketStatusChart', t.status_breakdown, COLORS.status);
+  drawDoughnut('machineStatusChart', t.machine_status_breakdown, null, COLORS.machine);
+  drawLine('ticketTrendChart', t.trend_30d, '#4da3ff');
+  drawDoughnut('woStatusChart', filterStageOpen(w.status_group_breakdown), null, COLORS.stage);
+  drawBar('woTypeChart', w.type_breakdown, COLORS.type);
+  drawLine('woTrendChart', w.trend_30d, '#34d399');
+
+  // ---- Leaderboard ----
+  renderLeaderboard(rawData.leaderboard || []);
+}
+
+function filterStageOpen(obj) {
+  // Show only non-completed stages for the "open WOs by stage" chart
+  const out = {};
+  Object.entries(obj || {}).forEach(([k, v]) => { if (k !== 'Completed' && k !== 'Cancelled') out[k] = v; });
+  return out;
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (v === null || v === undefined) { el.textContent = '–'; return; }
+  el.textContent = (typeof v === 'number' && !Number.isInteger(v)) ? v.toFixed(1) : v;
+}
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function drawDoughnut(id, dataObj, palette, colorMap) {
+  destroyChart(id);
+  const labels = Object.keys(dataObj || {});
+  const values = labels.map(l => dataObj[l]);
+  const colors = colorMap ? labels.map(l => colorMap[l] || '#8a97a8') : labels.map((_, i) => palette[i % palette.length]);
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#161b24', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } } }
+    }
+  });
+}
+
+function drawBar(id, dataObj, palette) {
+  destroyChart(id);
+  const entries = Object.entries(dataObj || {}).sort((a,b) => b[1]-a[1]);
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: labels.map((_,i)=>palette[i%palette.length]), borderRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: '#2a3340' }, ticks: { precision: 0 } }, y: { grid: { display: false } } }
+    }
+  });
+}
+
+function drawLine(id, arr, color) {
+  destroyChart(id);
+  const labels = (arr || []).map(d => d.date.substring(5));
+  const values = (arr || []).map(d => d.count);
+  const ctx = document.getElementById(id);
+  const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+  grad.addColorStop(0, color + '55'); grad.addColorStop(1, color + '00');
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ data: values, borderColor: color, backgroundColor: grad, fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }, y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+}
+
+function renderLeaderboard(lb) {
+  const body = document.getElementById('lbBody');
+  body.innerHTML = '';
+  lb.forEach((t, i) => {
+    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="rank ' + rankClass + '">' + (i+1) + '</span><span class="tech-name">' + escapeHtml(t.name) + '</span></td>' +
+      '<td class="num">' + t.tickets_mtd + '</td>' +
+      '<td class="num">' + t.wo_completed_mtd + '</td>' +
+      '<td class="num">' + (t.total_hrs ? t.total_hrs.toFixed(1) : '0.0') + '</td>' +
+      '<td class="num">' + (t.avg_hrs_per_wo || 0).toFixed(1) + '</td>' +
+      '<td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:' + (t.revenue_bar||0) + '%"></div></div></td>' +
+      '<td class="num kpi-target">—</td>';
+    body.appendChild(tr);
+  });
+}
+
+function escapeHtml(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// Division filter buttons
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentDivision = btn.dataset.div;
+  render();
+});
+
+fetchData();
+setInterval(fetchData, REFRESH_MS);
+</script>
+</body>
+</html>
