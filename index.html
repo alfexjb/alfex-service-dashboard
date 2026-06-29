@@ -255,8 +255,11 @@ async function fetchData() {
     document.getElementById('statusDot').classList.add('stale');
     document.getElementById('statusText').textContent = 'Connection error — retrying';
     if (!rawData) {
-      document.getElementById('overlay').innerHTML = '<div class="err">Could not load data from Salesforce.<br>The dashboard will keep retrying automatically.<br><br>' + e.message + '</div>';
+      document.getElementById('overlay').innerHTML = '<div class="err">Loading service data…<br>(retrying automatically)<br><br><span style="font-size:12px;opacity:.6">' + e.message + '</span></div>';
     }
+    // Quick self-heal: retry after 15s instead of waiting for the full refresh interval
+    clearTimeout(window.__retryTimer);
+    window.__retryTimer = setTimeout(fetchData, 15000);
   }
 }
 
