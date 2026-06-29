@@ -170,9 +170,8 @@
         <div class="kpi amber"><span class="label">Avg Age <span class="unit">days</span></span><span class="value" id="t_age">–</span></div>
       </div>
       <div class="panels">
-        <div class="panel"><h3>Open by Status</h3><div class="chart-wrap"><canvas id="ticketStatusChart"></canvas></div></div>
-        <div class="panel"><h3>Open by Machine Status</h3><div class="chart-wrap"><canvas id="machineStatusChart"></canvas></div></div>
-        <div class="panel wide"><h3>Tickets Created — Last 30 Days</h3><div class="chart-wrap"><canvas id="ticketTrendChart"></canvas></div></div>
+        <div class="panel wide"><h3>Open Tickets by Division &amp; Status</h3><div class="chart-wrap"><canvas id="ticketStatusDivChart"></canvas></div></div>
+        <div class="panel wide"><h3>Open Tickets by Division &amp; Machine Status</h3><div class="chart-wrap"><canvas id="ticketMachDivChart"></canvas></div></div>
       </div>
     </div>
 
@@ -185,9 +184,8 @@
         <div class="kpi amber"><span class="label">Avg Hrs / WO</span><span class="value" id="w_hrs">–</span></div>
       </div>
       <div class="panels">
-        <div class="panel"><h3>Open WOs by Stage</h3><div class="chart-wrap"><canvas id="woStatusChart"></canvas></div></div>
-        <div class="panel"><h3>WOs by Type</h3><div class="chart-wrap"><canvas id="woTypeChart"></canvas></div></div>
-        <div class="panel wide"><h3>Work Orders Completed — Last 30 Days</h3><div class="chart-wrap"><canvas id="woTrendChart"></canvas></div></div>
+        <div class="panel wide"><h3>Open vs Completed (MTD) by Division</h3><div class="chart-wrap"><canvas id="woOpenCompletedDivChart"></canvas></div></div>
+        <div class="panel wide"><h3>Work Orders by Division &amp; Type</h3><div class="chart-wrap"><canvas id="woTypeDivChart"></canvas></div></div>
       </div>
     </div>
 
@@ -283,13 +281,29 @@ function render() {
   setVal('w_scheduled', w.kpi.scheduled_today);
   setVal('w_hrs', w.kpi.avg_hrs_per_wo);
 
-  // ---- Charts ----
-  drawDoughnut('ticketStatusChart', t.status_breakdown, COLORS.status);
-  drawDoughnut('machineStatusChart', t.machine_status_breakdown, null, COLORS.machine);
-  drawLine('ticketTrendChart', t.trend_30d, '#4da3ff');
-  drawDoughnut('woStatusChart', filterStageOpen(w.status_group_breakdown), null, COLORS.stage);
-  drawBar('woTypeChart', w.type_breakdown, COLORS.type);
-  drawLine('woTrendChart', w.trend_30d, '#34d399');
+  // ---- Per-division grouped charts ----
+  const dc = rawData.division_charts || {};
+  const divs = dc.div_order || ['Haas','Laser','Additive'];
+
+  // Tickets: Division (x) x Status (series)
+  drawGroupedBar('ticketStatusDivChart', divs, dc.ticket_statuses || [],
+    (div, key) => ((dc.ticket_status_by_div||{})[div]||{})[key] || 0,
+    { 'Open': '#4da3ff', 'Assigned': '#fbbf24', 'In Progress': '#a78bfa' });
+
+  // Tickets: Division (x) x Machine Status (series)
+  drawGroupedBar('ticketMachDivChart', divs, dc.machine_statuses || [],
+    (div, key) => ((dc.ticket_machine_status_by_div||{})[div]||{})[key] || 0,
+    { 'Machine Down': '#f87171', 'Machine Limited': '#fbbf24', 'Machine Running': '#34d399', 'Not Applicable': '#8a97a8' });
+
+  // Work Orders: Division (x) x [Open, Completed MTD]
+  drawGroupedBar('woOpenCompletedDivChart', divs, ['Open WOs','Completed MTD'],
+    (div, key) => { const o = (dc.wo_open_completed_by_div||{})[div]||{}; return key === 'Open WOs' ? (o.open||0) : (o.completed||0); },
+    { 'Open WOs': '#4da3ff', 'Completed MTD': '#34d399' });
+
+  // Work Orders: Division (x) x Type (series)
+  drawGroupedBar('woTypeDivChart', divs, dc.wo_types || [],
+    (div, key) => ((dc.wo_type_by_div||{})[div]||{})[key] || 0,
+    { 'Machine Repair': '#4da3ff', 'Prev. Maintenance': '#34d399', 'Installation': '#fbbf24', 'Training': '#a78bfa', 'Other': '#8a97a8' });
 
   // ---- Leaderboard ----
   renderLeaderboard(rawData.leaderboard || []);
@@ -307,13 +321,6 @@ function renderDivisions(divs) {
   });
 }
 
-function filterStageOpen(obj) {
-  // Show only non-completed stages for the "open WOs by stage" chart
-  const out = {};
-  Object.entries(obj || {}).forEach(([k, v]) => { if (k !== 'Completed' && k !== 'Cancelled') out[k] = v; });
-  return out;
-}
-
 function setVal(id, v) {
   const el = document.getElementById(id);
   if (v === null || v === undefined) { el.textContent = '–'; return; }
@@ -322,60 +329,29 @@ function setVal(id, v) {
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
-function drawDoughnut(id, dataObj, palette, colorMap) {
+function drawGroupedBar(id, categories, seriesKeys, getValue, colorMap) {
   destroyChart(id);
-  const labels = Object.keys(dataObj || {});
-  const values = labels.map(l => dataObj[l]);
-  const colors = colorMap ? labels.map(l => colorMap[l] || '#8a97a8') : labels.map((_, i) => palette[i % palette.length]);
   const ctx = document.getElementById(id);
-  charts[id] = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#161b24', borderWidth: 2 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '62%',
-      plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } } }
-    }
-  });
-}
-
-function drawBar(id, dataObj, palette) {
-  destroyChart(id);
-  const entries = Object.entries(dataObj || {}).sort((a,b) => b[1]-a[1]);
-  const labels = entries.map(e => e[0]);
-  const values = entries.map(e => e[1]);
-  const ctx = document.getElementById(id);
+  const datasets = seriesKeys.map(key => ({
+    label: key,
+    data: categories.map(cat => getValue(cat, key)),
+    backgroundColor: (colorMap && colorMap[key]) || '#8a97a8',
+    borderRadius: 4,
+    maxBarThickness: 64
+  }));
   charts[id] = new Chart(ctx, {
     type: 'bar',
-    data: { labels, datasets: [{ data: values, backgroundColor: labels.map((_,i)=>palette[i%palette.length]), borderRadius: 4 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-      plugins: { legend: { display: false } },
-      scales: { x: { grid: { color: '#2a3340' }, ticks: { precision: 0 } }, y: { grid: { display: false } } }
-    }
-  });
-}
-
-function fmtDMY(iso) {
-  // iso = 'YYYY-MM-DD' -> 'dd-mm-yy'
-  const p = (iso || '').split('-');
-  if (p.length < 3) return iso || '';
-  return p[2] + '-' + p[1] + '-' + p[0].slice(2);
-}
-
-function drawLine(id, arr, color) {
-  destroyChart(id);
-  const labels = (arr || []).map(d => fmtDMY(d.date));
-  const values = (arr || []).map(d => d.count);
-  const ctx = document.getElementById(id);
-  const grad = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
-  grad.addColorStop(0, color + '55'); grad.addColorStop(1, color + '00');
-  charts[id] = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ data: values, borderColor: color, backgroundColor: grad, fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5 }] },
+    data: { labels: categories, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }, y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } } }
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 12, font: { size: 12 } } },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 14, weight: '700' }, color: '#f2f5f9' } },
+        y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
+      }
     }
   });
 }
