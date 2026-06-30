@@ -33,104 +33,83 @@
     color: var(--text);
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
-    padding: 18px 22px;
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
   /* ---------- Header ---------- */
   header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
   }
   .title-block { display: flex; align-items: baseline; gap: 16px; }
-  h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 30px;
-    font-weight: 400;
-    letter-spacing: 0.3px;
-  }
-  .subtitle { color: var(--muted); font-size: 14px; font-weight: 300; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; letter-spacing: 0.3px; }
+  .subtitle { color: var(--muted); font-size: 13px; font-weight: 300; }
   .header-right { display: flex; align-items: center; gap: 18px; }
-  .clock { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
-  .status-dot {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--muted);
-  }
+  .clock { font-size: 19px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .status-dot { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
   .dot.stale { background: var(--red); box-shadow: 0 0 8px var(--red); }
   /* ---------- Division summary strip (header) ---------- */
   .div-strip { display: flex; gap: 10px; }
-  .div-card {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-    padding: 7px 14px;
-  }
+  .div-card { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 6px 13px; }
   .div-dot { width: 9px; height: 9px; border-radius: 50%; }
   .div-name { font-size: 13px; font-weight: 700; }
-  .div-stats { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  /* ---------- Layout grid ---------- */
+  .div-stats { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  /* ---------- Main layout: 3 columns over 2 rows ---------- */
   .grid {
     flex: 1; display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    gap: 14px; min-height: 0;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 12px; min-height: 0;
   }
   .section-head {
-    grid-column: span 1; display: flex; align-items: center; gap: 10px;
-    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--muted); padding-bottom: 2px;
+    display: flex; align-items: center; gap: 9px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 2px;
   }
-  .section-head .bar { width: 4px; height: 18px; border-radius: 2px; }
-  .col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .section-head .bar { width: 4px; height: 16px; border-radius: 2px; }
+  .col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  /* Tickets occupies left column (1); work orders occupy columns 2-3 */
+  .col-tickets { grid-column: 1; grid-row: 1; }
+  .col-wo { grid-column: 2 / 4; grid-row: 1; }
+  .bottom-row { grid-column: 1 / 4; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0; }
   /* ---------- KPI tiles ---------- */
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi-row { display: grid; gap: 10px; }
+  .kpi-row.two { grid-template-columns: repeat(2, 1fr); }
   .kpi {
     background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 15px; display: flex; flex-direction: column; gap: 4px;
   }
-  .kpi .label { font-size: 11.5px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
-  .kpi .value { font-size: 38px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-  .kpi .unit { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .kpi .label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+  .kpi .value { font-size: 40px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
   .kpi.accent .value { color: var(--accent); }
   .kpi.green .value { color: var(--green); }
   .kpi.amber .value { color: var(--amber); }
   .kpi.red .value { color: var(--red); }
   /* ---------- Chart panels ---------- */
-  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; min-height: 0; }
   .panel {
     background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 12px 14px; display: flex; flex-direction: column; min-height: 0;
+    padding: 11px 14px; display: flex; flex-direction: column; min-height: 0;
   }
-  .panel h3 { font-size: 12.5px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .panel h3 { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
   .panel .chart-wrap { position: relative; flex: 1; min-height: 0; }
-  .panel.wide { grid-column: span 2; }
-  /* ---------- Leaderboard ---------- */
-  .leaderboard-section { grid-column: span 2; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .col .panel { flex: 1; }
+  /* Work orders inner grid: 2x2 */
+  .wo-charts { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+  /* ---------- Compact leaderboard ---------- */
   .lb-table { width: 100%; border-collapse: collapse; }
-  .lb-table th {
-    text-align: left; font-size: 10.5px; color: var(--muted); font-weight: 500;
-    text-transform: uppercase; letter-spacing: .5px; padding: 4px 12px; border-bottom: 1px solid var(--border);
-  }
+  .lb-table th { text-align: left; font-size: 10px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; padding: 3px 10px; border-bottom: 1px solid var(--border); }
   .lb-table th.num, .lb-table td.num { text-align: right; }
-  .lb-table td { padding: 4px 12px; font-size: 13.5px; border-bottom: 1px solid rgba(42,51,64,.5); font-variant-numeric: tabular-nums; }
+  .lb-table td { padding: 3px 10px; font-size: 12.5px; border-bottom: 1px solid rgba(42,51,64,.5); font-variant-numeric: tabular-nums; }
   .lb-table tr:last-child td { border-bottom: none; }
-  .rank { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 5px; background: var(--panel-2); font-size: 11px; font-weight: 700; margin-right: 9px; color: var(--muted); }
+  .rank { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 5px; background: var(--panel-2); font-size: 10.5px; font-weight: 700; margin-right: 8px; color: var(--muted); }
   .rank.gold { background: #3a3416; color: var(--amber); }
   .rank.silver { background: #2a2f38; color: #cbd5e1; }
   .rank.bronze { background: #3a2a1a; color: #d9a066; }
   .tech-name { font-weight: 500; }
-  .bar-cell { width: 160px; }
-  .bar-track { background: var(--panel-2); border-radius: 4px; height: 8px; width: 100%; overflow: hidden; }
-  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 4px; }
-  .kpi-target { color: var(--muted); }
   /* ---------- Loading / error ---------- */
-  #overlay {
-    position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px; z-index: 100; transition: opacity .4s; font-size: 16px; color: var(--muted);
-  }
+  #overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 100; transition: opacity .4s; font-size: 16px; color: var(--muted); }
   #overlay.hidden { opacity: 0; pointer-events: none; }
   .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -146,9 +125,9 @@
       <span class="subtitle">Live operations dashboard</span>
     </div>
     <div class="div-strip" id="divStrip">
-      <div class="div-card" data-div="Haas"><span class="div-dot" style="background:var(--haas)"></span><span class="div-name">Haas</span><span class="div-stats" id="div_Haas">–</span></div>
-      <div class="div-card" data-div="Laser"><span class="div-dot" style="background:var(--laser)"></span><span class="div-name">Laser</span><span class="div-stats" id="div_Laser">–</span></div>
-      <div class="div-card" data-div="Additive"><span class="div-dot" style="background:var(--additive)"></span><span class="div-name">Additive</span><span class="div-stats" id="div_Additive">–</span></div>
+      <div class="div-card"><span class="div-dot" style="background:var(--haas)"></span><span class="div-name">Haas</span><span class="div-stats" id="div_Haas">–</span></div>
+      <div class="div-card"><span class="div-dot" style="background:var(--laser)"></span><span class="div-name">Laser</span><span class="div-stats" id="div_Laser">–</span></div>
+      <div class="div-card"><span class="div-dot" style="background:var(--additive)"></span><span class="div-name">Additive</span><span class="div-stats" id="div_Additive">–</span></div>
     </div>
     <div class="header-right">
       <div class="clock" id="clock">--:--</div>
@@ -157,42 +136,36 @@
   </header>
 
   <div class="grid">
-    <!-- Section headers -->
-    <div class="section-head"><span class="bar" style="background:var(--accent)"></span>Service Tickets</div>
-    <div class="section-head"><span class="bar" style="background:var(--green)"></span>Work Orders</div>
-
-    <!-- LEFT COLUMN: TICKETS -->
-    <div class="col">
-      <div class="kpi-row">
-        <div class="kpi accent"><span class="label">Open Tickets</span><span class="value" id="t_open">–</span></div>
-        <div class="kpi"><span class="label">Opened Today</span><span class="value" id="t_today">–</span></div>
+    <!-- LEFT COLUMN: TICKETS (compact) -->
+    <div class="col col-tickets">
+      <div class="section-head"><span class="bar" style="background:var(--accent)"></span>Service Tickets</div>
+      <div class="kpi-row two">
+        <div class="kpi accent"><span class="label">Opened Tickets</span><span class="value" id="t_open">–</span></div>
         <div class="kpi red"><span class="label">High Priority</span><span class="value" id="t_high">–</span></div>
-        <div class="kpi amber"><span class="label">Avg Age <span class="unit">days</span></span><span class="value" id="t_age">–</span></div>
       </div>
-      <div class="panels">
-        <div class="panel wide"><h3>Open Tickets by Division &amp; Status</h3><div class="chart-wrap"><canvas id="ticketStatusDivChart"></canvas></div></div>
-        <div class="panel wide"><h3>Open Tickets by Division &amp; Machine Status</h3><div class="chart-wrap"><canvas id="ticketMachDivChart"></canvas></div></div>
+      <div class="panel"><h3>Ticket Share by Division</h3><div class="chart-wrap"><canvas id="ticketShareChart"></canvas></div></div>
+      <div class="panel"><h3>Avg Days to Close by Division</h3><div class="chart-wrap"><canvas id="ticketResolveChart"></canvas></div></div>
+    </div>
+
+    <!-- MIDDLE + RIGHT COLUMNS: WORK ORDERS -->
+    <div class="col col-wo">
+      <div class="section-head"><span class="bar" style="background:var(--green)"></span>Work Orders</div>
+      <div class="wo-charts">
+        <div class="panel"><h3>Open Work Orders by Division</h3><div class="chart-wrap"><canvas id="woOpenChart"></canvas></div></div>
+        <div class="panel"><h3>Scheduled This Week — by Team &amp; Division</h3><div class="chart-wrap"><canvas id="woSchedChart"></canvas></div></div>
+        <div class="panel"><h3>Completed by Division — This Week vs This Month</h3><div class="chart-wrap"><canvas id="woCompletedChart"></canvas></div></div>
+        <div class="panel"><h3>Service Tech Output — This Month (relative)</h3><div class="chart-wrap"><canvas id="techRevenueChart"></canvas></div></div>
       </div>
     </div>
 
-    <!-- RIGHT COLUMN: WORK ORDERS -->
-    <div class="col">
-      <div class="kpi-row">
-        <div class="kpi green"><span class="label">Open WOs</span><span class="value" id="w_open">–</span></div>
-        <div class="kpi"><span class="label">Completed MTD</span><span class="value" id="w_completed">–</span></div>
-        <div class="kpi accent"><span class="label">Scheduled Today</span><span class="value" id="w_scheduled">–</span></div>
-        <div class="kpi amber"><span class="label">Avg Hrs / WO</span><span class="value" id="w_hrs">–</span></div>
+    <!-- BOTTOM ROW: two complementary charts -->
+    <div class="bottom-row">
+      <div class="panel" style="min-height:180px;">
+        <h3>Completed Work Orders by Team — This Month</h3>
+        <div class="chart-wrap"><canvas id="woCompletedTeamChart"></canvas></div>
       </div>
-      <div class="panels">
-        <div class="panel wide"><h3>Open vs Completed (MTD) by Division</h3><div class="chart-wrap"><canvas id="woOpenCompletedDivChart"></canvas></div></div>
-        <div class="panel wide"><h3>Work Orders by Division &amp; Type</h3><div class="chart-wrap"><canvas id="woTypeDivChart"></canvas></div></div>
-      </div>
-    </div>
-
-    <!-- LEADERBOARD -->
-    <div class="leaderboard-section">
-      <div class="section-head"><span class="bar" style="background:var(--purple)"></span>Technician Performance — This Month</div>
-      <div class="panel" style="padding:4px 6px;">
+      <div class="panel" style="min-height:180px; padding:8px 10px;">
+        <div class="section-head" style="margin-bottom:6px;"><span class="bar" style="background:var(--purple)"></span>Technician Output — This Month</div>
         <table class="lb-table">
           <thead>
             <tr>
@@ -201,8 +174,6 @@
               <th class="num">WOs Completed</th>
               <th class="num">Labour Hrs</th>
               <th class="num">Avg Hrs / WO</th>
-              <th>Output (relative)</th>
-              <th class="num">KPI Target</th>
             </tr>
           </thead>
           <tbody id="lbBody"></tbody>
@@ -214,18 +185,10 @@
 <script>
 const API_URL = "https://alfex.app.n8n.cloud/webhook/alfex-service-dashboard?token=82CgN3OZRUDYe4NWEmsURxvIdVN_Vsyh";
 const REFRESH_MS = 5 * 60 * 1000; // 5 minutes
-const DIVISION_LABELS = { "All": "All Divisions", "Haas": "Haas", "Alfex": "Laser", "Additive": "Additive" };
+const DIV_COLORS = { 'Haas': '#4da3ff', 'Laser': '#34d399', 'Additive': '#a78bfa' };
 
 let rawData = null;
-let currentDivision = "All";
 let charts = {};
-
-const COLORS = {
-  status: ['#4da3ff', '#fbbf24', '#a78bfa', '#34d399', '#f87171', '#8a97a8'],
-  machine: { 'Machine Down': '#f87171', 'Machine Limited': '#fbbf24', 'Machine Running': '#34d399', 'Not Applicable': '#8a97a8' },
-  stage: { 'Active': '#4da3ff', 'Waiting': '#fbbf24', 'Scheduled': '#a78bfa', 'Completed': '#34d399', 'Cancelled': '#8a97a8', 'Other': '#64748b' },
-  type: ['#4da3ff', '#34d399', '#fbbf24', '#a78bfa', '#f87171', '#22d3ee', '#fb923c', '#94a3b8']
-};
 
 Chart.defaults.color = '#8a97a8';
 Chart.defaults.font.family = 'Roboto';
@@ -255,60 +218,49 @@ async function fetchData() {
     if (!rawData) {
       document.getElementById('overlay').innerHTML = '<div class="err">Loading service data…<br>(retrying automatically)<br><br><span style="font-size:12px;opacity:.6">' + e.message + '</span></div>';
     }
-    // Quick self-heal: retry after 15s instead of waiting for the full refresh interval
     clearTimeout(window.__retryTimer);
     window.__retryTimer = setTimeout(fetchData, 15000);
   }
 }
 
-// NOTE: The current API returns org-wide aggregates. Division filtering on tickets
-// (by machine type) and work orders (by record type) is applied client-side where
-// the API exposes per-division breakdowns; KPI tiles show org-wide figures until
-// the API is extended to accept a division parameter (planned enhancement).
 function render() {
   if (!rawData) return;
-  const t = rawData.tickets, w = rawData.work_orders;
+  const v = rawData.layout_v3;
+  if (!v) { console.error('layout_v3 missing'); return; }
+  const divs = v.div_order || ['Haas','Laser','Additive'];
 
   // ---- Ticket KPIs ----
-  setVal('t_open', t.kpi.open);
-  setVal('t_today', t.kpi.opened_today);
-  setVal('t_high', t.kpi.high_priority_open);
-  setVal('t_age', t.kpi.avg_age_days);
+  setVal('t_open', v.tickets.opened);
+  setVal('t_high', v.tickets.high_priority);
 
-  // ---- WO KPIs ----
-  setVal('w_open', w.kpi.open);
-  setVal('w_completed', w.kpi.completed_mtd);
-  setVal('w_scheduled', w.kpi.scheduled_today);
-  setVal('w_hrs', w.kpi.avg_hrs_per_wo);
+  // ---- Ticket share by division (doughnut) ----
+  drawDoughnut('ticketShareChart', divs, divs.map(d => (v.tickets.share_by_div||{})[d] || 0), divs.map(d => DIV_COLORS[d]));
 
-  // ---- Per-division grouped charts ----
-  const dc = rawData.division_charts || {};
-  const divs = dc.div_order || ['Haas','Laser','Additive'];
+  // ---- Avg days to close by division (horizontal bar; null = awaiting data) ----
+  drawResolveBar('ticketResolveChart', divs, v.tickets.avg_resolve_days_by_div || {});
 
-  // Tickets: Division (x) x Status (series)
-  drawGroupedBar('ticketStatusDivChart', divs, dc.ticket_statuses || [],
-    (div, key) => ((dc.ticket_status_by_div||{})[div]||{})[key] || 0,
-    { 'Open': '#4da3ff', 'Assigned': '#fbbf24', 'In Progress': '#a78bfa' });
+  // ---- Open WOs by division (bar, colored per division) ----
+  const wo = v.work_orders;
+  drawDivBar('woOpenChart', divs, divs.map(d => (wo.open_by_div||{})[d] || 0));
 
-  // Tickets: Division (x) x Machine Status (series)
-  drawGroupedBar('ticketMachDivChart', divs, dc.machine_statuses || [],
-    (div, key) => ((dc.ticket_machine_status_by_div||{})[div]||{})[key] || 0,
-    { 'Machine Down': '#f87171', 'Machine Limited': '#fbbf24', 'Machine Running': '#34d399', 'Not Applicable': '#8a97a8' });
+  // ---- Scheduled this week by team x division (stacked bar) ----
+  drawTeamStacked('woSchedChart', wo.scheduled_week_by_team || {}, divs);
 
-  // Work Orders: Division (x) x [Open, Completed MTD]
-  drawGroupedBar('woOpenCompletedDivChart', divs, ['Open WOs','Completed MTD'],
-    (div, key) => { const o = (dc.wo_open_completed_by_div||{})[div]||{}; return key === 'Open WOs' ? (o.open||0) : (o.completed||0); },
-    { 'Open WOs': '#4da3ff', 'Completed MTD': '#34d399' });
+  // ---- Completed by division: this week vs this month (grouped bar) ----
+  drawGroupedBar('woCompletedChart', divs, ['This Week','This Month'],
+    (div, key) => key === 'This Week' ? ((wo.completed_week_by_div||{})[div]||0) : ((wo.completed_month_by_div||{})[div]||0),
+    { 'This Week': '#fbbf24', 'This Month': '#34d399' });
 
-  // Work Orders: Division (x) x Type (series)
-  drawGroupedBar('woTypeDivChart', divs, dc.wo_types || [],
-    (div, key) => ((dc.wo_type_by_div||{})[div]||{})[key] || 0,
-    { 'Machine Repair': '#4da3ff', 'Prev. Maintenance': '#34d399', 'Installation': '#fbbf24', 'Training': '#a78bfa', 'Other': '#8a97a8' });
+  // ---- Tech revenue comparison (horizontal, relative, NO $) ----
+  drawTechRevenue('techRevenueChart', v.tech_revenue_comparison || []);
 
-  // ---- Leaderboard ----
+  // ---- Bottom: completed WOs by team this month (stacked by division) ----
+  drawTeamStacked('woCompletedTeamChart', wo.completed_month_by_team || {}, divs);
+
+  // ---- Bottom: compact tech leaderboard ----
   renderLeaderboard(rawData.leaderboard || []);
 
-  // ---- Per-division summary strip ----
+  // ---- Header division strip ----
   renderDivisions(rawData.divisions || {});
 }
 
@@ -316,41 +268,142 @@ function renderDivisions(divs) {
   ['Haas','Laser','Additive'].forEach(d => {
     const el = document.getElementById('div_' + d);
     if (!el) return;
-    const v = divs[d] || { open_tickets:0, open_wos:0, completed_mtd:0 };
-    el.innerHTML = v.open_tickets + ' tkt &middot; ' + v.open_wos + ' open WO &middot; ' + v.completed_mtd + ' done';
+    const x = divs[d] || { open_tickets:0, open_wos:0, completed_mtd:0 };
+    el.innerHTML = x.open_tickets + ' tkt &middot; ' + x.open_wos + ' open WO &middot; ' + x.completed_mtd + ' done';
   });
 }
 
 function setVal(id, v) {
   const el = document.getElementById(id);
+  if (!el) return;
   if (v === null || v === undefined) { el.textContent = '–'; return; }
   el.textContent = (typeof v === 'number' && !Number.isInteger(v)) ? v.toFixed(1) : v;
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
+// Doughnut for ticket share
+function drawDoughnut(id, labels, data, colors) {
+  destroyChart(id);
+  const total = data.reduce((s,v)=>s+v,0);
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#161b24', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 13 } } },
+        tooltip: { callbacks: { label: (c) => c.label + ': ' + c.parsed + (total ? ' (' + Math.round(c.parsed/total*100) + '%)' : '') } }
+      }
+    }
+  });
+}
+
+// Horizontal bar for avg days to close (handles null = awaiting data)
+function drawResolveBar(id, divs, map) {
+  destroyChart(id);
+  const data = divs.map(d => map[d]);
+  const display = data.map(v => v === null || v === undefined ? 0 : v);
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels: divs, datasets: [{ data: display, backgroundColor: divs.map(d => DIV_COLORS[d]), borderRadius: 4, maxBarThickness: 38 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => { const raw = map[divs[c.dataIndex]]; return raw === null || raw === undefined ? 'Awaiting data' : raw + ' days avg'; } } }
+      },
+      scales: {
+        x: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'days (lower = faster)', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 14, weight: '700' }, color: '#f2f5f9' } }
+      }
+    }
+  });
+}
+
+// Vertical bar, one bar per division, colored
+function drawDivBar(id, divs, data) {
+  destroyChart(id);
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels: divs, datasets: [{ data, backgroundColor: divs.map(d => DIV_COLORS[d]), borderRadius: 4, maxBarThickness: 70 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 14, weight: '700' }, color: '#f2f5f9' } },
+        y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+}
+
+// Generic grouped bar: categories on x, one dataset per seriesKey
 function drawGroupedBar(id, categories, seriesKeys, getValue, colorMap) {
   destroyChart(id);
-  const ctx = document.getElementById(id);
   const datasets = seriesKeys.map(key => ({
     label: key,
     data: categories.map(cat => getValue(cat, key)),
     backgroundColor: (colorMap && colorMap[key]) || '#8a97a8',
-    borderRadius: 4,
-    maxBarThickness: 64
+    borderRadius: 4, maxBarThickness: 54
   }));
-  charts[id] = new Chart(ctx, {
+  charts[id] = new Chart(document.getElementById(id), {
     type: 'bar',
     data: { labels: categories, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 13, weight: '700' }, color: '#f2f5f9' } },
+        y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+}
+
+// Stacked bar: x = team, stacks = divisions
+function drawTeamStacked(id, teamMap, divs) {
+  destroyChart(id);
+  const teams = Object.keys(teamMap);
+  // shorten long team names for axis legibility
+  const shortLabels = teams.map(t => t.replace(' (NSW)','').replace(' (VIC)','').replace(' (QLD)','').replace(' - ', ' · '));
+  const datasets = divs.map(d => ({
+    label: d,
+    data: teams.map(t => (teamMap[t]||{})[d] || 0),
+    backgroundColor: DIV_COLORS[d],
+    borderRadius: 3, maxBarThickness: 46
+  }));
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels: shortLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11.5, weight: '500' }, color: '#cdd6e2', maxRotation: 18, minRotation: 0 } },
+        y: { stacked: true, grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+}
+
+// Horizontal relative bars for tech output (no $)
+function drawTechRevenue(id, list) {
+  destroyChart(id);
+  const labels = list.map(t => t.name);
+  const data = list.map(t => t.bar);
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: '#4da3ff', borderRadius: 4, maxBarThickness: 18 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 12, font: { size: 12 } } },
-        tooltip: { mode: 'index', intersect: false }
+        legend: { display: false },
+        tooltip: { callbacks: { label: (c) => 'Relative output: ' + c.parsed.x + ' / 100' } }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 14, weight: '700' }, color: '#f2f5f9' } },
-        y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
+        x: { grid: { color: '#2a3340' }, beginAtZero: true, max: 100, ticks: { display: false }, title: { display: true, text: 'relative output (no $ values)', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 12, weight: '500' }, color: '#f2f5f9' } }
       }
     }
   });
@@ -367,9 +420,7 @@ function renderLeaderboard(lb) {
       '<td class="num">' + t.tickets_mtd + '</td>' +
       '<td class="num">' + t.wo_completed_mtd + '</td>' +
       '<td class="num">' + (t.total_hrs ? t.total_hrs.toFixed(1) : '0.0') + '</td>' +
-      '<td class="num">' + (t.avg_hrs_per_wo || 0).toFixed(1) + '</td>' +
-      '<td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:' + (t.revenue_bar||0) + '%"></div></div></td>' +
-      '<td class="num kpi-target">—</td>';
+      '<td class="num">' + (t.avg_hrs_per_wo || 0).toFixed(1) + '</td>';
     body.appendChild(tr);
   });
 }
