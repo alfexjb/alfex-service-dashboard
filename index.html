@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
   :root {
     --bg: #0c0f14;
@@ -193,6 +194,10 @@ let charts = {};
 Chart.defaults.color = '#8a97a8';
 Chart.defaults.font.family = 'Roboto';
 Chart.defaults.font.size = 13;
+// Register datalabels plugin but keep it OFF by default; charts opt in per-config.
+if (window.ChartDataLabels) { Chart.register(window.ChartDataLabels); }
+Chart.defaults.plugins = Chart.defaults.plugins || {};
+Chart.defaults.plugins.datalabels = { display: false };
 
 function updateClock() {
   const now = new Date();
@@ -329,7 +334,16 @@ function drawDivBar(id, divs, data) {
     data: { labels: divs, datasets: [{ data, backgroundColor: divs.map(d => DIV_COLORS[d]), borderRadius: 4, maxBarThickness: 70 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'end', align: 'end', offset: 2,
+          color: '#f2f5f9', font: { size: 14, weight: '700' },
+          formatter: (v) => v
+        }
+      },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 14, weight: '700' }, color: '#f2f5f9' } },
         y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
@@ -352,7 +366,17 @@ function drawGroupedBar(id, categories, seriesKeys, getValue, colorMap) {
     data: { labels: categories, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } }, tooltip: { mode: 'index', intersect: false } },
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } },
+        tooltip: { mode: 'index', intersect: false },
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'end', align: 'end', offset: 2,
+          color: '#f2f5f9', font: { size: 13, weight: '700' },
+          formatter: (v) => v
+        }
+      },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 13, weight: '700' }, color: '#f2f5f9' } },
         y: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
@@ -378,7 +402,16 @@ function drawTeamStacked(id, teamMap, divs) {
     data: { labels: shortLabels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } }, tooltip: { mode: 'index', intersect: false } },
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 10, font: { size: 12 } } },
+        tooltip: { mode: 'index', intersect: false },
+        datalabels: {
+          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+          anchor: 'center', align: 'center',
+          color: '#0c0f14', font: { size: 12, weight: '700' },
+          formatter: (v) => v
+        }
+      },
       scales: {
         x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11.5, weight: '500' }, color: '#cdd6e2', maxRotation: 18, minRotation: 0 } },
         y: { stacked: true, grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 } }
