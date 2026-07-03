@@ -28,16 +28,20 @@
     --additive: #a78bfa;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+  html, body { height: 100%; width: 100%; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
+  }
+  /* Fixed 1920x1080 design canvas, scaled with JS transform to fit any screen (4K TV, 720p TV, 24" PC). */
+  #fit { position: fixed; top: 0; left: 0; transform-origin: top left; }
+  #stage {
+    width: 1920px; height: 1080px;
     padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    box-sizing: border-box;
   }
   /* ---------- Header ---------- */
   header {
@@ -61,7 +65,7 @@
   .grid {
     flex: 1; display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr 300px;
     gap: 12px; min-height: 0;
   }
   .section-head {
@@ -139,6 +143,7 @@
   </div>
   <div id="overlay"><div class="spinner"></div><div>Loading service data…</div></div>
 
+  <div id="fit"><div id="stage">
   <header>
     <div class="title-block">
       <h1>Service Department</h1>
@@ -180,11 +185,11 @@
 
     <!-- BOTTOM ROW: two complementary charts -->
     <div class="bottom-row">
-      <div class="panel" style="min-height:180px;">
+      <div class="panel" style="min-height:0;">
         <h3>Service Revenue — This Month vs YTD (relative)</h3>
         <div class="chart-wrap"><canvas id="techRevenueChart"></canvas></div>
       </div>
-      <div class="panel" style="min-height:180px; padding:8px 10px;">
+      <div class="panel" style="min-height:0; padding:8px 10px; overflow:hidden;">
         <div class="section-head" style="margin-bottom:6px;"><span class="bar" style="background:var(--purple)"></span>Technician Output — This Month</div>
         <table class="lb-table">
           <thead>
@@ -201,6 +206,7 @@
       </div>
     </div>
   </div>
+  </div></div>
 
 <script>
 const API_URL = "https://alfex.app.n8n.cloud/webhook/alfex-service-dashboard?token=82CgN3OZRUDYe4NWEmsURxvIdVN_Vsyh";
@@ -223,6 +229,26 @@ function updateClock() {
   document.getElementById('clock').textContent = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 setInterval(updateClock, 1000); updateClock();
+
+// ---- Auto-fit: scale the fixed 1920x1080 stage to fill the actual screen ----
+// Robust against TV browsers that report odd effective viewports / zoom.
+const DESIGN_W = 1920, DESIGN_H = 1080;
+function fitStage() {
+  const fit = document.getElementById('fit');
+  if (!fit) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+  // center within the viewport (letterbox any leftover space)
+  const offX = Math.max(0, (vw - DESIGN_W * scale) / 2);
+  const offY = Math.max(0, (vh - DESIGN_H * scale) / 2);
+  fit.style.transform = 'translate(' + offX + 'px,' + offY + 'px) scale(' + scale + ')';
+  // Charts need an explicit resize after the transform so their internal canvas matches.
+  try { Object.values(charts).forEach(c => { if (c && c.resize) c.resize(); }); } catch (e) {}
+}
+window.addEventListener('resize', fitStage);
+window.addEventListener('orientationchange', fitStage);
+window.addEventListener('load', fitStage);
+fitStage();
 
 async function fetchData() {
   try {
@@ -286,6 +312,9 @@ function render() {
 
   // ---- Header division strip ----
   renderDivisions(rawData.divisions || {});
+
+  // Re-fit after charts are (re)built so canvas sizes match the scaled stage.
+  requestAnimationFrame(fitStage);
 }
 
 function renderDivisions(divs) {
@@ -500,6 +529,7 @@ function unlockDashboard() {
   const gate = document.getElementById('gate');
   if (gate) gate.classList.add('hidden');
   startDashboard();
+  requestAnimationFrame(fitStage);
 }
 
 (function initGate() {
