@@ -181,7 +181,7 @@
     <!-- BOTTOM ROW: two complementary charts -->
     <div class="bottom-row">
       <div class="panel" style="min-height:180px;">
-        <h3>Service Revenue — This Month (relative)</h3>
+        <h3>Service Revenue — This Month vs YTD (relative)</h3>
         <div class="chart-wrap"><canvas id="techRevenueChart"></canvas></div>
       </div>
       <div class="panel" style="min-height:180px; padding:8px 10px;">
@@ -443,19 +443,24 @@ function drawTeamStacked(id, teamMap, divs) {
 function drawTechRevenue(id, list) {
   destroyChart(id);
   const labels = list.map(t => t.name);
-  const data = list.map(t => t.bar);
+  // Bars are scaled by ACTUAL dollar revenue on the backend (0-100 of shared max); no $ shown.
+  const ytd = list.map(t => (t.ytd_bar != null ? t.ytd_bar : t.bar));
+  const month = list.map(t => (t.month_bar != null ? t.month_bar : 0));
   charts[id] = new Chart(document.getElementById(id), {
     type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: '#4da3ff', borderRadius: 4, maxBarThickness: 18 }] },
+    data: { labels, datasets: [
+      { label: 'This Month', data: month, backgroundColor: '#4da3ff', borderRadius: 3, maxBarThickness: 10 },
+      { label: 'YTD', data: ytd, backgroundColor: '#34d399', borderRadius: 3, maxBarThickness: 10 }
+    ] },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: (c) => 'Relative output: ' + c.parsed.x + ' / 100' } }
+        legend: { display: true, position: 'top', align: 'end', labels: { color: '#8a97a8', boxWidth: 10, boxHeight: 10, font: { size: 11 } } },
+        tooltip: { enabled: false }
       },
       scales: {
-        x: { grid: { color: '#2a3340' }, beginAtZero: true, max: 100, ticks: { display: false }, title: { display: true, text: 'relative output (no $ values)', font: { size: 11 } } },
-        y: { grid: { display: false }, ticks: { font: { size: 12, weight: '500' }, color: '#f2f5f9' } }
+        x: { grid: { color: '#2a3340' }, beginAtZero: true, max: 100, ticks: { display: false }, title: { display: true, text: 'relative to top earner (no $ values)', color: '#8a97a8', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 11, weight: '500' }, color: '#f2f5f9' } }
       }
     }
   });
