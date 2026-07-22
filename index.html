@@ -156,6 +156,7 @@
     </div>
     <div class="header-right">
       <div class="clock" id="clock">--:--</div>
+      <div style="font-size:11px;color:#8a97a8;" id="vpDebug"></div>
       <div class="status-dot"><span class="dot" id="statusDot"></span><span id="statusText">Updated --</span></div>
     </div>
   </header>
@@ -227,6 +228,9 @@ Chart.defaults.plugins.datalabels = { display: false };
 function updateClock() {
   const now = new Date();
   document.getElementById('clock').textContent = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
+  // TEMP: show viewport size for TV calibration
+  const vp = document.getElementById('vpDebug');
+  if (vp) vp.textContent = window.innerWidth + 'x' + window.innerHeight;
 }
 setInterval(updateClock, 1000); updateClock();
 
