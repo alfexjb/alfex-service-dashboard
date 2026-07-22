@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1920">
 <meta name="robots" content="noindex, nofollow">
 <title>Alfex Service Department Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,10 +35,11 @@
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
   }
-  /* Fixed 1920x1080 design canvas, scaled with JS transform to fit any screen (4K TV, 720p TV, 24" PC). */
-  #fit { position: fixed; top: 0; left: 0; transform-origin: top left; }
+  /* Fixed 1920x1080 design canvas. The viewport meta (width=1920) tells all browsers (incl. TV)
+     to lay out at 1920 CSS px and scale to fit the physical screen automatically. */
+  #fit { display: contents; }
   #stage {
-    width: 1920px; height: 1080px;
+    width: 1920px; height: 100vh;
     padding: 16px 20px;
     display: flex; flex-direction: column; gap: 12px;
     box-sizing: border-box;
@@ -230,25 +231,6 @@ function updateClock() {
 }
 setInterval(updateClock, 1000); updateClock();
 
-// ---- Auto-fit: scale the fixed 1920x1080 stage to fill the actual screen ----
-// Robust against TV browsers that report odd effective viewports / zoom.
-const DESIGN_W = 1920, DESIGN_H = 1080;
-function fitStage() {
-  const fit = document.getElementById('fit');
-  if (!fit) return;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
-  // center within the viewport (letterbox any leftover space)
-  const offX = Math.max(0, (vw - DESIGN_W * scale) / 2);
-  const offY = Math.max(0, (vh - DESIGN_H * scale) / 2);
-  fit.style.transform = 'translate(' + offX + 'px,' + offY + 'px) scale(' + scale + ')';
-  // Charts need an explicit resize after the transform so their internal canvas matches.
-  try { Object.values(charts).forEach(c => { if (c && c.resize) c.resize(); }); } catch (e) {}
-}
-window.addEventListener('resize', fitStage);
-window.addEventListener('orientationchange', fitStage);
-window.addEventListener('load', fitStage);
-fitStage();
 
 async function fetchData() {
   try {
@@ -313,8 +295,6 @@ function render() {
   // ---- Header division strip ----
   renderDivisions(rawData.divisions || {});
 
-  // Re-fit after charts are (re)built so canvas sizes match the scaled stage.
-  requestAnimationFrame(fitStage);
 }
 
 function renderDivisions(divs) {
@@ -529,7 +509,6 @@ function unlockDashboard() {
   const gate = document.getElementById('gate');
   if (gate) gate.classList.add('hidden');
   startDashboard();
-  requestAnimationFrame(fitStage);
 }
 
 (function initGate() {
