@@ -39,8 +39,8 @@
   #fit { display: contents; }
   #stage {
     width: 100vw; height: 100vh;
-    padding: clamp(8px, 1.2vh, 18px) clamp(10px, 1.2vw, 22px);
-    display: flex; flex-direction: column; gap: clamp(6px, 0.9vh, 14px);
+    padding: clamp(5px, 0.9vh, 14px) clamp(8px, 1vw, 18px);
+    display: flex; flex-direction: column; gap: clamp(4px, 0.7vh, 10px);
     box-sizing: border-box;
   }
   /* ---------- Header ---------- */
@@ -48,7 +48,7 @@
     display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
   }
   .title-block { display: flex; align-items: baseline; gap: 16px; }
-  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(16px, 2.2vw, 30px); font-weight: 400; letter-spacing: 0.3px; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(14px, 1.8vw, 26px); font-weight: 400; letter-spacing: 0.3px; white-space: nowrap; }
   .subtitle { color: var(--muted); font-size: clamp(10px, 1vw, 14px); font-weight: 300; }
   .header-right { display: flex; align-items: center; gap: 18px; }
   .clock { font-size: clamp(13px, 1.4vw, 22px); font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -57,7 +57,7 @@
   .dot.stale { background: var(--red); box-shadow: 0 0 8px var(--red); }
   /* ---------- Division summary strip (header) ---------- */
   .div-strip { display: flex; gap: 10px; }
-  .div-card { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 6px 13px; }
+  .div-card { display: flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; }
   .div-dot { width: 9px; height: 9px; border-radius: 50%; }
   .div-name { font-size: clamp(10px, 1vw, 14px); font-weight: 700; }
   .div-stats { font-size: clamp(9px, 0.85vw, 12.5px); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -65,8 +65,8 @@
   .grid {
     flex: 1; display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr clamp(220px, 28vh, 320px);
-    gap: clamp(6px, 0.9vh, 14px); min-height: 0;
+    grid-template-rows: 1fr clamp(160px, 26vh, 280px);
+    gap: clamp(4px, 0.7vh, 10px); min-height: 0;
   }
   .section-head {
     display: flex; align-items: center; gap: 9px;
@@ -74,20 +74,20 @@
     color: var(--muted); margin-bottom: 2px;
   }
   .section-head .bar { width: 4px; height: 16px; border-radius: 2px; }
-  .col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: clamp(4px, 0.7vh, 10px); min-height: 0; }
   /* Tickets occupies left column (1); work orders occupy columns 2-3 */
   .col-tickets { grid-column: 1; grid-row: 1; }
   .col-wo { grid-column: 2 / 4; grid-row: 1; }
-  .bottom-row { grid-column: 1 / 4; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0; }
+  .bottom-row { grid-column: 1 / 4; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(4px, 0.7vh, 10px); min-height: 0; }
   /* ---------- KPI tiles ---------- */
   .kpi-row { display: grid; gap: 10px; }
   .kpi-row.two { grid-template-columns: repeat(2, 1fr); }
   .kpi {
     background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 12px 15px; display: flex; flex-direction: column; gap: 4px;
+    padding: clamp(6px, 1vh, 14px) clamp(8px, 1vw, 16px); display: flex; flex-direction: column; gap: 3px;
   }
   .kpi .label { font-size: clamp(9px, 0.75vw, 12px); color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
-  .kpi .value { font-size: clamp(22px, 3.2vw, 46px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .kpi .value { font-size: clamp(18px, 2.6vw, 40px); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
   .kpi.accent .value { color: var(--accent); }
   .kpi.green .value { color: var(--green); }
   .kpi.amber .value { color: var(--amber); }
@@ -95,13 +95,13 @@
   /* ---------- Chart panels ---------- */
   .panel {
     background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-    padding: 11px 14px; display: flex; flex-direction: column; min-height: 0;
+    padding: clamp(5px, 0.8vh, 12px) clamp(7px, 0.8vw, 14px); display: flex; flex-direction: column; min-height: 0;
   }
   .panel h3 { font-size: clamp(9px, 0.75vw, 13px); font-weight: 500; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
   .panel .chart-wrap { position: relative; flex: 1; min-height: 0; }
   .col .panel { flex: 1; }
   /* Work orders inner grid: 2x2 */
-  .wo-charts { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+  .wo-charts { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: clamp(4px, 0.7vh, 10px); flex: 1; min-height: 0; }
   /* ---------- Compact leaderboard ---------- */
   .lb-table { width: 100%; border-collapse: collapse; }
   .lb-table th { text-align: left; font-size: clamp(8px, 0.65vw, 11px); color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; padding: 3px 8px; border-bottom: 1px solid var(--border); }
@@ -156,7 +156,6 @@
     </div>
     <div class="header-right">
       <div class="clock" id="clock">--:--</div>
-      <div style="font-size:11px;color:#8a97a8;" id="vpDebug"></div>
       <div class="status-dot"><span class="dot" id="statusDot"></span><span id="statusText">Updated --</span></div>
     </div>
   </header>
@@ -228,9 +227,6 @@ Chart.defaults.plugins.datalabels = { display: false };
 function updateClock() {
   const now = new Date();
   document.getElementById('clock').textContent = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit', hour12: false });
-  // TEMP: show viewport size for TV calibration
-  const vp = document.getElementById('vpDebug');
-  if (vp) vp.textContent = window.innerWidth + 'x' + window.innerHeight;
 }
 setInterval(updateClock, 1000); updateClock();
 
