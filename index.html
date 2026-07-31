@@ -129,6 +129,13 @@
   #gateForm button { padding: 12px 14px; border-radius: 8px; border: none; background: var(--accent); color: #06121f; font-weight: 700; font-size: 15px; cursor: pointer; font-family: 'Roboto', sans-serif; }
   #gateForm button:hover { filter: brightness(1.08); }
   .gate-err { color: var(--red); font-size: 13px; text-align: center; min-height: 16px; }
+  /* ---------- Avg Days 3-col stat grid ---------- */
+  .avg-days-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(4px, 0.6vw, 10px); flex: 1; align-items: stretch; padding-top: 4px; height: 100%; }
+  #avgDaysPanel { display: flex; flex-direction: column; }
+  .avg-days-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: var(--panel-2); border-radius: 10px; padding: clamp(6px, 1vh, 14px) 4px; }
+  .avg-days-cell .div-name { font-size: clamp(9px, 0.75vw, 13px); font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+  .avg-days-cell .div-val { font-size: clamp(16px, 2vw, 30px); font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
+  .avg-days-cell .div-unit { font-size: clamp(8px, 0.65vw, 11px); color: var(--muted); }
 </style>
 </head>
 <body>
@@ -169,7 +176,7 @@
         <div class="kpi red"><span class="label">High Priority</span><span class="value" id="t_high">–</span></div>
       </div>
       <div class="panel"><h3>Ticket Share by Division</h3><div class="chart-wrap"><canvas id="ticketShareChart"></canvas></div></div>
-      <div class="panel"><h3>Avg Days to Close Ticket</h3><div class="chart-wrap"><canvas id="ticketResolveChart"></canvas></div></div>
+      <div class="panel" id="avgDaysPanel"><h3>Avg Days to Close Ticket</h3><div id="avgDaysGrid" class="avg-days-grid"></div></div>
     </div>
 
     <!-- MIDDLE + RIGHT COLUMNS: WORK ORDERS -->
@@ -267,8 +274,8 @@ function render() {
   // ---- Ticket share by division (doughnut) ----
   drawDoughnut('ticketShareChart', divs, divs.map(d => (v.tickets.share_by_div||{})[d] || 0), divs.map(d => DIV_COLORS[d]));
 
-  // ---- Avg days to close by division (horizontal bar; null = awaiting data) ----
-  drawResolveBar('ticketResolveChart', divs, v.tickets.avg_resolve_days_by_div || {});
+  // ---- Avg days to close by division (3-col stat grid) ----
+  renderAvgDaysGrid('avgDaysGrid', divs, v.tickets.avg_resolve_days_by_div || {});
 
   // ---- Open WOs by division (bar, colored per division) ----
   const wo = v.work_orders;
@@ -356,6 +363,22 @@ function drawResolveBar(id, divs, map) {
       }
     }
   });
+}
+
+// 3-column stat grid for avg days to close
+function renderAvgDaysGrid(id, divs, map) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = divs.map(d => {
+    const val = map[d];
+    const hasData = val !== null && val !== undefined && val > 0;
+    const colour = DIV_COLORS[d] || '#94a3b8';
+    return `<div class="avg-days-cell">
+      <span class="div-name" style="color:${colour}">${d}</span>
+      <span class="div-val" style="color:${colour}">${hasData ? val.toFixed(1) : '–'}</span>
+      <span class="div-unit">${hasData ? 'days avg' : 'no data'}</span>
+    </div>`;
+  }).join('');
 }
 
 // Vertical bar, one bar per division, colored
