@@ -334,8 +334,13 @@ function drawDoughnut(id, labels, data, colors) {
 // Horizontal bar for avg days to close (handles null = awaiting data)
 function drawResolveBar(id, divs, map) {
   destroyChart(id);
-  const data = divs.map(d => map[d]);
-  const display = data.map(v => v === null || v === undefined ? 0 : v);
+  // Always show all divisions, use a small sentinel value (0.15) for missing/zero so the bar
+  // is invisible but the y-axis label still renders.
+  const display = divs.map(d => {
+    const v = map[d];
+    return (v === null || v === undefined || v === 0) ? 0.15 : v;
+  });
+  const rawMap = map;
   charts[id] = new Chart(document.getElementById(id), {
     type: 'bar',
     data: { labels: divs, datasets: [{ data: display, backgroundColor: divs.map(d => DIV_COLORS[d]), borderRadius: 4, maxBarThickness: 38 }] },
@@ -343,7 +348,7 @@ function drawResolveBar(id, divs, map) {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { callbacks: { label: (c) => { const raw = map[divs[c.dataIndex]]; return raw === null || raw === undefined ? 'Awaiting data' : raw + ' days avg'; } } }
+        tooltip: { callbacks: { label: (c) => { const raw = rawMap[divs[c.dataIndex]]; return (raw === null || raw === undefined || raw === 0) ? 'No data this period' : raw + ' days avg'; } } }
       },
       scales: {
         x: { grid: { color: '#2a3340' }, beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'days (lower = faster)', font: { size: 11 } } },
